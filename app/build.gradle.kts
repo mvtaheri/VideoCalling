@@ -69,5 +69,5 @@ dependencies {
     implementation(libs.bundles.koin)
     implementation(libs.bundles.stream)
     implementation(libs.compose.navigation)
-    implementation(libs.serialization)
+    implementation(libs.kotlinx.serialization.json)
 }
