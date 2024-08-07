@@ -1,9 +1,11 @@
 package com.vahid.videocalling
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -31,44 +33,53 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VideoCallingTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val navController = rememberNavController()
-                    NavHost(
-                        navController = navController,
-                        startDestination = ConnectRoute,
-                        modifier = Modifier.padding(innerPadding)
+                Scaffold { innerPadding ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
                     ) {
-                        composable<ConnectRoute> {
-                            val viewmodel = koinViewModel<ConnectViewModel>()
-                            val state = viewmodel.state
+                        val navController = rememberNavController()
+                        NavHost(
+                            navController = navController,
+                            startDestination = ConnectRoute
+                        ) {
+                            composable<ConnectRoute> {
+                                val viewModel = koinViewModel<ConnectViewModel>()
+                                val state = viewModel.state
 
-                            LaunchedEffect(key1 = state.isConnected) {
-                                if (state.isConnected) {
-                                    navController.navigate(VideoCallRoute) {
-                                        popUpTo(ConnectRoute) {
-                                            inclusive = true
+                                LaunchedEffect(key1 = state.isConnected) {
+                                    if (state.isConnected) {
+                                        navController.navigate(VideoCallRoute) {
+                                            popUpTo(ConnectRoute) {
+                                                inclusive = true
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            ConnectScreen(state = state, onAction = viewmodel::onAction)
-                        }
-                        composable<VideoCallRoute> {
-                            val viewModel = koinViewModel<VideoCallViewModel>()
-                            val state = viewModel.state
 
-                            LaunchedEffect(key1 = state.callState) {
-                                if (state.callState == CallState.ENDED) {
-                                    navController.navigate(ConnectRoute) {
-                                        popUpTo(VideoCallRoute) {
-                                            inclusive = true
+                                ConnectScreen(state = state, onAction = viewModel::onAction)
+                            }
+                            composable<VideoCallRoute> {
+                                val viewModel = koinViewModel<VideoCallViewModel>()
+                                val state = viewModel.state
+
+                                LaunchedEffect(key1 = state.callState) {
+                                    if (state.callState == CallState.ENDED) {
+                                        navController.navigate(ConnectRoute) {
+                                            popUpTo(VideoCallRoute) {
+                                                inclusive = true
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            VideoTheme {
 
-                                VideoCallScreen(state = state, onAction = viewModel::onAction)
+                                VideoTheme {
+                                    VideoCallScreen(
+                                        state = state,
+                                        onAction = viewModel::onAction
+                                    )
+                                }
                             }
                         }
                     }
